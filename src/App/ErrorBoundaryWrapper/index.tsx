@@ -1,4 +1,4 @@
-import { NotFounded } from "@/components/notFound";
+import { NotFounded } from "@/components/NotFound";
 import { ErrorBoundary } from "react-error-boundary";
 
 function ErrorBoundaryWrapper({ children }: { children: React.ReactNode }) {

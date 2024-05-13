@@ -2,21 +2,24 @@ import { editUser } from "@/types/user";
 import axios from "../utils/axios";
 
 export const getUsersApi = async (page: number) => {
-  const response = await axios.get(`/api/users?page=${page}`);
-  return response.data;
+  const { data } = await axios.get(`/api/users?page=${page}`);
+  return data;
 };
 
 export const deleteUserApi = async (id: number) => {
-  const response = await axios.delete(`/api/users/${id}`);
-  return response.data;
+  const { data } = await axios.delete(`/api/users/${id}`);
+  return data;
 };
 
-export const editUserApi = async (id: number, userValues: editUser) => {
-  const response = await axios.put(`/api/users/${id}`, userValues);
-  return response.data;
+export const editUserApi = async ({ userId, firstName, lastName }: { userId: number, firstName: string, lastName: string }) => {
+  const { data } = await axios.put(`/api/users/${userId}`, {
+    first_name: firstName,
+    last_name: lastName
+  });
+  return data;
 };
 
 export const createUserApi = async (userValues: editUser) => {
-  const response = await axios.post("/api/users/", userValues);
-  return response.data;
+  const { data } = await axios.post("/api/users/", userValues);
+  return data;
 };

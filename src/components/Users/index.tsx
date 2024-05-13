@@ -1,18 +1,23 @@
 import { User } from "@/types/user";
-import { TableBox } from "../tools/table";
+
 import { Box, LoadingOverlay, Pagination, Skeleton } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { deleteUserApi, getUsersApi } from "@/services/user";
 import { useNavigate } from "react-router-dom";
-
 import { modals } from "@mantine/modals";
 import { Text } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import EditUser from "./EditUser";
 import CreateUser from "./CreateUser";
+import { useUserStore } from "@/store/user";
+import { TableBox } from "../Tools/table";
 
 function Users() {
   let navigate = useNavigate();
+  const { getToken, setToken } = useUserStore();
+
+  if (getToken() === null) {
+    navigate("/login");
+  }
 
   const [usersData, setUsersData] = useState<User[]>([]);
   const [userId, setUserId] = useState<number>(0);
@@ -48,12 +53,12 @@ function Users() {
   async function getUsers(pageNumber: string) {
     try {
       setLoading(true);
-      const { data, page, per_page, total } = await getUsersApi(
+      const { data, page, per_page, total_pages } = await getUsersApi(
         parseInt(pageNumber)
       );
       setUsersData(data);
       updateUrlParams(page);
-      setTotal(total);
+      setTotal(total_pages);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -85,21 +90,20 @@ function Users() {
     setUsersData(updatedUsers);
   };
 
-  const editUser = () => {
+  const editUser = ({
+    firstName,
+    lastName,
+  }: {
+    firstName: string;
+    lastName: string;
+  }) => {
     return (
       <EditUser
-        status={openEditUser}
-        changeStatus={() => setOpenEditUser(!openEditUser)}
-        userID={userId}
-      />
-    );
-  };
-
-  const createUser = () => {
-    return (
-      <CreateUser
-        status={openEditUser}
-        changeStatus={() => setOpenEditUser(!openEditUser)}
+        opened={openEditUser}
+        onClose={() => setOpenEditUser(!openEditUser)}
+        userId={userId}
+        firstName={firstName}
+        lastName={lastName}
       />
     );
   };
@@ -127,9 +131,8 @@ function Users() {
   if (usersData.length > 0) {
     return (
       <>
-        {editUser()}
-        {/* {createUser()} */}
-        <Box pos="relative" className="p-8 mt-12">
+        <div className="h-[50px]"></div>
+        <Box pos="relative" className="mt-12">
           <LoadingOverlay
             visible={loading}
             zIndex={1000}

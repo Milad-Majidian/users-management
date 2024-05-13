@@ -19,6 +19,7 @@ function Router() {
       <Route path="/" element={<Navigate to="/Login" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/users" element={<Users />} />
+      <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
 }

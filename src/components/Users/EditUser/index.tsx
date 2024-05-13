@@ -9,51 +9,65 @@ import {
   Group,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function EditUser({
-  status,
-  changeStatus,
-  userID,
+  opened,
+  onClose,
+  userId,
+  firstName,
+  lastName,
 }: {
-  status: boolean;
-  changeStatus: () => void;
-  userID: number;
+  opened: boolean;
+  onClose: () => void;
+  userId: number;
+  firstName: string;
+  lastName: string;
 }) {
   const form = useForm({
     initialValues: {
-      name: "",
-      job: "",
+      firstName: "",
+      lastName: "",
     },
-    validate: zodResolver(schemaValidator),
   });
+
+  useEffect(() => {
+    form.setValues({
+      firstName,
+      lastName
+    })
+  }, [firstName, lastName])
 
   const [loading, setLoading] = useState(false);
 
-  /**
-   * Edit User
-   * @constructor
-   * @param {editUser} userValues - Value of User.
-   */
-  async function handleSubmit(values: editUser) {
+  async function handleSubmit(values: typeof form.values) {
     try {
+      console.log(values);
       setLoading(true);
-      const { data } = await editUserApi(userID, values);
-      console.log("data", data);
+      const response = await editUserApi({
+        userId,
+        firstName: values.firstName,
+        lastName: values.lastName,
+      });
       setLoading(false);
-      changeStatus();
+      notifications.show({
+        title: "User Edited",
+        message: `User ${response.first_name} edited successfully`,
+        color: "green",
+      });
+      onClose();
     } catch (error) {
       setLoading(false);
-      console.error(error);
     }
   }
 
   return (
     <>
       <Drawer
-        opened={status}
-        onClose={changeStatus}
+        opened={opened}
+        onClose={onClose}
         title="Edit User"
         overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
       >
@@ -70,18 +84,18 @@ function EditUser({
               className="w-[350px] lg:w-[400px] flex flex-col justify-start items-start gap-6 shadow-custom p-10 rounded-xl bg-white"
             >
               <TextInput
-                label="Name"
+                label="First Name"
                 type="text"
-                placeholder="Enter your Name"
-                {...form.getInputProps("name")}
+                placeholder="Enter your first name"
+                {...form.getInputProps("firstName")}
                 className="w-full"
               />
 
               <TextInput
-                label="job"
+                label="Last Name"
                 type="text"
-                placeholder="Enter your Job"
-                {...form.getInputProps("job")}
+                placeholder="Enter your last name"
+                {...form.getInputProps("lastName")}
                 className="w-full"
               />
               <Group mt="md" className="w-full">

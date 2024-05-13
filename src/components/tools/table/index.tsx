@@ -3,6 +3,8 @@ import { User } from "@/types/user";
 import { FaPencilAlt } from "react-icons/fa";
 import { FaTrashCan } from "react-icons/fa6";
 import { FaEye } from "react-icons/fa";
+import EditUser from "@/components/Users/EditUser";
+import { Button, Modal } from "@mantine/core";
 
 interface TableBoxProps {
   data: User[];
@@ -15,8 +17,61 @@ export function TableBox({
   openDeleteModal,
   editUserDrawer,
 }: TableBoxProps) {
+
+  const [editUserOpen, setEditUserOpen] = useState(false);
+
+
+  const [user, setUser] = useState({
+    userId: 0,
+    firstName: "",
+    lastName: "",
+    email: ""
+  })
+
+  const [showUser, setShowUser] = useState(false)
   return (
     <>
+      <Modal
+        opened={showUser}
+        onClose={() => setShowUser(false)}
+        title="User Profile"
+        centered
+        size={'lg'}
+      >
+        <div className="w-full grid grid-cols-2 gap-5 mt-8">
+          <div className="col-span-1">
+            <p className="font-bold text-lg">
+              <span>First Name: </span>
+              <span className="ml-4 font-medium">
+                {user.firstName}
+              </span>
+            </p>
+          </div>
+          <div className="col-span-1 pb-3">
+            <p className="font-bold text-lg">
+              <span>Last Name: </span>
+              <span className="ml-4 font-medium">
+                {user.lastName}
+              </span>
+            </p>
+          </div>
+          <div className="col-span-2 pb-3">
+            <p className="font-bold text-lg">
+              <span>Email Address: </span>
+              <span className="ml-4 font-medium">
+                {user.email}
+              </span>
+            </p>
+          </div>
+        </div>
+      </Modal>
+      <EditUser
+        opened={editUserOpen}
+        onClose={() => setEditUserOpen(!editUserOpen)}
+        userId={user.userId}
+        firstName={user.firstName}
+        lastName={user.lastName}
+      />
       <table className="min-w-full divide-y divide-gray-200 rounded-xl ">
         <thead className="bg-gray-50">
           <tr>
@@ -57,7 +112,17 @@ export function TableBox({
                 <div className="w-full flex justify-start items-center gap-3">
                   <button
                     className="text-indigo-600 hover:bg-primary-light transition-all duration-200 p-1 rounded-md"
-                    onClick={editUserDrawer}
+                    onClick={
+                      () => {
+                        setUser({
+                          ...user,
+                          userId: user.id,
+                          firstName: user.first_name,
+                          lastName: user.last_name
+                        });
+                        setEditUserOpen(!editUserOpen)
+                      }
+                    }
                   >
                     <FaPencilAlt />
                   </button>
@@ -67,7 +132,17 @@ export function TableBox({
                   >
                     <FaTrashCan />
                   </button>
-                  <button className="hover:bg-primary-light transition-all duration-200 p-1 rounded-md">
+                  <button
+                    onClick={() => {
+                      setUser({
+                        ...user,
+                        userId: user.id,
+                        firstName: user.first_name,
+                        lastName: user.last_name
+                      });
+                      setShowUser(true);
+                    }}
+                    className="hover:bg-primary-light transition-all duration-200 p-1 rounded-md">
                     <FaEye />
                   </button>
                 </div>

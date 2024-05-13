@@ -7,17 +7,19 @@ import {
   TextInput,
   LoadingOverlay,
   Group,
+  Notification,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications, showNotification } from "@mantine/notifications";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useState } from "react";
 
 function CreateUser({
-  status,
-  changeStatus,
+  opened,
+  onClose,
 }: {
-  status: boolean;
-  changeStatus: () => void;
+  opened: boolean;
+  onClose: () => void;
 }) {
   const form = useForm({
     initialValues: {
@@ -32,21 +34,26 @@ function CreateUser({
   async function handleSubmit(values: editUser) {
     try {
       setLoading(true);
-      const { data } = await createUserApi(values);
-      console.log("data", data);
+      const { name, job } = await createUserApi(values);
       setLoading(false);
-      changeStatus();
+      form.reset();
+      notifications.show({
+        title: "User Created",
+        message: `User ${name} created successfully`,
+        color: "green",
+      });
+      onClose();
     } catch (error) {
       setLoading(false);
-      console.error(error);
+      console.log(error);
     }
   }
 
   return (
     <>
       <Drawer
-        opened={status}
-        onClose={changeStatus}
+        opened={opened}
+        onClose={onClose}
         title="Create User"
         overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
       >

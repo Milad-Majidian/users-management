@@ -1,16 +1,29 @@
-import React from "react";
-
+import React, { useEffect } from "react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
-
 import { TextInput, Button, Group, Box, LoadingOverlay } from "@mantine/core";
 import { LoginProps, schema } from "@/types/login";
 import { login } from "@/services/login";
+import { useUserStore } from "@/store/user";
 
-function Login() {
+
+
+export default function Login() {
   const [visible, setVisible] = React.useState(false);
   let navigate = useNavigate();
+
+  const { getToken, setToken } = useUserStore()
+
+  useEffect(() => {
+    if (typeof getToken() == 'string') {
+      navigate("/users");
+    }
+  }, [getToken, navigate])
+
+  if (typeof getToken() == 'string') {
+    navigate("/users");
+  }
 
   const form = useForm({
     initialValues: {
@@ -18,13 +31,7 @@ function Login() {
       password: "",
     },
     validate: zodResolver(schema),
-    // validationRules: {
-    //   email: (value: string) => /^\S+@\S+\.\S+$/.test(value),
-    //   password: (value: string) => value.length >= 6,
-    // },
   });
-  // form.validate();
-  // form.errors;
 
   async function handleSubmit(values: LoginProps) {
     setVisible(true);
@@ -33,18 +40,15 @@ function Login() {
     try {
       const response = await login({ email, password });
       setVisible(false);
-      console.log(response);
-      localStorage.setItem("dashboard_token", response.token);
+      setToken(response.token);
       navigate("/users");
-      // localStorage.getItem("lastname");
     } catch (error) {
       setVisible(false);
-      console.log(error);
     }
   }
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-screen bg-zinc-200">
       <Box pos="relative">
         <LoadingOverlay
           visible={visible}
@@ -80,14 +84,3 @@ function Login() {
   );
 }
 
-export default Login;
-
-// <TextInput
-//   label="Email"
-//   placeholder="Enter your email"
-//   value={form.values.email}
-//   onChange={(event) => form.setFieldValue("email", event.currentTarget.value)}
-//   error={form.errors.email && "Invalid email"}
-//   required
-//   className="w-full"
-// />;

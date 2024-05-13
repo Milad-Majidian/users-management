@@ -5,15 +5,13 @@ import AppProvider from "./AppProvider";
 import "@mantine/core/styles.css";
 import ErrorBoundaryWrapper from "./ErrorBoundaryWrapper";
 import Header from "@/components/Header";
-import { ContactContext } from "@/context";
-import { useState } from "react";
+import '@mantine/notifications/styles.css';
 
 function App() {
   return (
     <>
       <ErrorBoundaryWrapper>
         <AppProvider>
-          <Header />
           <Router />
         </AppProvider>
       </ErrorBoundaryWrapper>
